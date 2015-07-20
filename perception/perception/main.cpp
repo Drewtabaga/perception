@@ -1,13 +1,26 @@
 #include <Windows.h>
-LPCTSTR WndClassName = "Perception - 0.0.0.1";
+#include "window.h"
+LPCTSTR WndClassName = "Perception";
 HWND hwnd = NULL; //window instance
 const int Width = 1024; //window width
 const int Height = 768; //window height
-bool InitializeWindow(HINSTANCE hInstance, int showWnd, int width, int height, bool windowed); 
-int messageLoop();
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-//main function
 
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+	Window* window = new Window();
+	if (!window->InitializeWindow(&hInstance, &hwnd, &WndClassName, nShowCmd, Width, Height, true))
+	{
+		MessageBox(0, "Window Initialization - Failed", "Error", MB_OK);
+		return 1;
+	}
+	window->messageLoop();
+	return 0;
+}
+//bool InitializeWindow(HINSTANCE hInstance, int showWnd, int width, int height, bool windowed); 
+//int messageLoop();
+//LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+//main function
+/*
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	if(!InitializeWindow(hInstance, nShowCmd, Width, Height, true))
@@ -17,8 +30,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	messageLoop();
 	return 0;
-}
-
+}*/
+/*
 //Window Initialization Function
 bool InitializeWindow(HINSTANCE hInstance, //handle to application
 						int ShowWnd, //how the window should be displayed
@@ -153,4 +166,4 @@ LRESULT CALLBACK WndProc(HWND hwnd, //window handler
 			return 0;
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
+}*/
