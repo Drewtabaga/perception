@@ -1,169 +1,144 @@
 #include <Windows.h>
 #include "window.h"
-LPCTSTR WndClassName = "Perception";
+#include <d3d10.h>
+#include "dxmanager.h"
+ID3D10Device* d3dDevice; //sofrware controller to the graphics device
+IDXGISwapChain* swapChain; //buffer to stop screen flickering (multilayered visuals)
+ID3D10RenderTargetView* renderTargetView; //render target for back buffer
 HWND hwnd = NULL; //window instance
-const int Width = 1024; //window width
-const int Height = 768; //window height
-
+LPCTSTR wndClassName = "Perception"; //class name
+LPCSTR wndTitle = "Perception - Pre-game"; //window title
+int width = 1024; //window width
+int height = 768; //window height
+bool windowed = true; //windowed (T/F)
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	//creates a pointer for the window
 	Window* window = new Window();
-	if (!window->InitializeWindow(&hInstance, &hwnd, &WndClassName, nShowCmd, Width, Height, true))
+	//creates a pointer for DirectX
+	DXManager* dxm = new DXManager();
+	//initializes the window, and if it fails, quits and sends a message.
+	if (!window->InitializeWindow(&hInstance, &hwnd, wndClassName, wndTitle, nShowCmd, &width, &height, &windowed))
 	{
 		MessageBox(0, "Window Initialization - Failed", "Error", MB_OK);
-		return 1;
+		return 0;
+	}
+	//Initializes Direct3D
+	if (!dxm->InitializeDirect3dApp(&hInstance, &hwnd, d3dDevice, swapChain, renderTargetView, &width, &height, &windowed))
+	{
+		MessageBox(0, "Direct3D Initialization - Failed", "Error", MB_OK);
+		return 0;
+	}
+	//If all else succeeds, Initializes the scene.
+	if (!dxm->InitScene())
+	{
+		MessageBox(0, "Scene Initialization - Failed", "Error", MB_OK);
+		return 0;
 	}
 	window->messageLoop();
+	
 	return 0;
 }
-//bool InitializeWindow(HINSTANCE hInstance, int showWnd, int width, int height, bool windowed); 
-//int messageLoop();
-//LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-//main function
 /*
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+bool InitializeDirect3dApp(HINSTANCE hInstance)
 {
-	if(!InitializeWindow(hInstance, nShowCmd, Width, Height, true))
+	typedef struct DXGI_SWAP_CHAIN_DESC
 	{
-		MessageBox(0, "Window Initialization - Failed", "Error", MB_OK);
-		return 1;
-	}
-	messageLoop();
-	return 0;
-}*/
-/*
-//Window Initialization Function
-bool InitializeWindow(HINSTANCE hInstance, //handle to application
-						int ShowWnd, //how the window should be displayed
-						int width, int height, bool windowed)
-{
-	//extended styles of WNDCLASSESEX
-	typedef struct _WNDCLASS
+		DXGI_MODE_DESC   BufferDesc;
+		DXGI_SAMPLE_DESC SampleDesc;
+		DXGI_USAGE       BufferUsage;
+		UINT             BufferCount;
+		HWND             OutputWindow;
+		BOOL             Windowed;
+		DXGI_SWAP_EFFECT SwapEffect;
+		UINT             Flags;
+	} DXGI_SWAP_CHAIN_DESC;
+	DXGI_SWAP_CHAIN_DESC scd;
+	typedef struct DXGI_MODE_DESC
 	{
-		UINT cbSize;
-		UINT style;
-		WNDPROC lpfnWndProc;
-		int cbClsExtra;
-		int cbWndExtra;
-		HANDLE hInstance;
-		HICON hIcon;
-		HCURSOR hCursor;
-		HBRUSH hbrBackground;
-		LPCTSTR lpszMenuName;
-		LPCTSTR lpszClassName;
-	} WNDCLASS; 
-	WNDCLASSEX wc;
+		UINT                     Width;
+		UINT                     Height;
+		DXGI_RATIONAL            RefreshRate;
+		DXGI_FORMAT              Format;
+		DXGI_MODE_SCANLINE_ORDER ScanlineOrdering;
+		DXGI_MODE_SCALING        Scaling;
+	} DXGI_MODE_DESC, *LPDXGI_MODE_DESC;
+	scd.BufferDesc.Width = width;
+	scd.BufferDesc.Height = height;
+	scd.BufferDesc.RefreshRate.Numerator = 60;
+	scd.BufferDesc.RefreshRate.Denominator = 1;
+	scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	scd.SampleDesc.Count = 1;
+	scd.SampleDesc.Quality = 0;
+	scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	scd.BufferCount = 1;
+	scd.OutputWindow = hwnd; 
+	scd.Windowed = true;
+	scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	scd.Flags = 0;
+	HRESULT  D3D10CreateDeviceAndSwapChain(
+		__in   IDXGIAdapter *pAdapter,
+		__in   D3D10_DRIVER_TYPE DriverType,
+		__in   HMODULE Software,
+		__in   UINT Flags,
+		__in   UINT SDKVersion,
+		__in   DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
+		__out  IDXGISwapChain **ppSwapChain,
+		__out  ID3D10Device **ppDevice
+		); 
+	D3D10CreateDeviceAndSwapChain(0,
+		D3D10_DRIVER_TYPE_HARDWARE,
+		0,
+		0,
+		D3D10_SDK_VERSION,
+		&scd,
+		&swapChain,
+		&d3dDevice);
+	ID3D10Texture2D* backBuffer;
+	swapChain->GetBuffer(0, _uuidof(ID3D10Texture2D), (LPVOID*)&backBuffer);
+	d3dDevice->CreateRenderTargetView(backBuffer, 0, &renderTargetView);
+	backBuffer->Release();
+	d3dDevice->OMSetRenderTargets(1, &renderTargetView, NULL);
+	D3D10_VIEWPORT vp;
+	vp.TopLeftX = 0;
+	vp.TopLeftY = 0;
+	vp.Width = width;
+	vp.Height = height;
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	d3dDevice->RSSetViewports(1, &vp);
+	const FLOAT bgColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	d3dDevice->ClearRenderTargetView(renderTargetView, bgColor);
 
-	//initializes wc to be the same sizes as WNDCLASSEX
-	wc.cbSize = sizeof(WNDCLASSEX);
-
-	//enabled styles for our window
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-
-	//pointer to windows messages function
-	wc.lpfnWndProc = WndProc;
-
-	//#extra bytes allocated after WNDCLASSEX
-	wc.cbClsExtra = NULL;
-
-	//#extra bytes allocated after the windows instance
-	wc.cbWndExtra = NULL;
-
-	//makes wc's instance handler the same as the one we are using
-	wc.hInstance = hInstance;
-
-	//sets the icon at the top left corner of the window
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-
-	//sets the cursor's icon
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-
-	//sets background color (black)
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 2);
-
-	//name to the menu attached to the window. (We don't have one)
-	wc.lpszMenuName = NULL;
-
-	//Name of Class
-	wc.lpszClassName = WndClassName;
-
-	//Taskbar Icon
-	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-
-	//Register's class, ends if failed (would not create window)
-	if (!RegisterClassEx(&wc))
-	{
-		MessageBox(NULL, "Error registering class", "Error", MB_OK | MB_ICONERROR);
-		return 1;
-	}
-
-	//Creation of window
-	hwnd = CreateWindowEx(NULL, //WNDCLASSEX Styles to be applied to this specific window
-						WndClassName, //name of registered class that we use
-						"Perception - 0.0.0.1", //name of the window
-						WS_OVERLAPPEDWINDOW, //window styles (seperate by '|')
-						CW_USEDEFAULT, CW_USEDEFAULT, //Starting x&y positions
-						width, height, //size of window
-						NULL, //handle to parent window (we don't have a parent)
-						NULL, //handle to menu attached to window (no menu)
-						hInstance, //instance of current program
-						NULL
-						); //if use of MDI client (we don't)
-	//if the window fails to initialize
-	if (!hwnd)
-	{
-		MessageBox(NULL, "Error creating window", "Error", MB_OK | MB_ICONERROR);
-		return 1;
-	}
-	ShowWindow(hwnd, ShowWnd);
-	UpdateWindow(hwnd); 
+	swapChain->Present(0, 0);
 
 	return true;
 }
-//Message Loop until program is closed
-int messageLoop(){
-	MSG msg;
-	ZeroMemory(&msg, sizeof(MSG));
-	while (true){
-		if (PeekMessage(&msg, //LPMSG lpMsg, pointer to message structure
-						NULL, //HWND hWndParam, hande to the window that is sending the message (NULL=takes message from any window in the program
-						0, //UINT wMsgFilterMin, max value of the message range to be examined (MIN & MAX = 0, all messages are examined)
-						0, //wMsgFilterMax, max value of the message range to be examined (MIN & MAX = 0, all messages are examined)
-						PM_REMOVE)) //UINT wRemoveMsg, how the message will be handled
-		{
-			//if the message was a quit message, close the program
-			if (msg.message == WM_QUIT)
-				break;
-			//if the message was a windows message, translate and dispatch.
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		//if it was not a windows message, run the game
-		else
-		{
-			//game code
-		}
-	}
-	return msg.wParam;
+bool InitScene()
+{
+
+	return true;
 }
-//message processing
-LRESULT CALLBACK WndProc(HWND hwnd, //window handler
-						UINT msg, //message handler
-						WPARAM wParam, //extra message information(keyboard imput detection)
-						LPARAM lParam) //extra message information(keyboard imput detection)
-{ 
-	switch (msg)
-	{
-		case WM_KEYDOWN:
-			if (wParam == VK_ESCAPE)
-			{
-				if (MessageBox(0, "Are you sure you want to quit?", "Really?", MB_YESNO | MB_ICONQUESTION) == IDYES)
-					DestroyWindow(hwnd);
-			}
-			return 0;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
-	}
-	return DefWindowProc(hwnd, msg, wParam, lParam);
-}*/
+void DrawScene()
+{
+	red += colormodr * 0.00005f;
+	green += colormodg * 0.00002f;
+	blue += colormodb * 0.00001f;
+
+	if (red >= 1.0f || red <= 0.0f)
+		colormodr *= -1;
+	if (green >= 1.0f || green <= 0.0f)
+		colormodg *= -1;
+	if (blue >= 1.0f || blue <= 0.0f)
+		colormodb *= -1;
+
+
+	const FLOAT bgColor[4] = { red, green, blue, 1.0f };
+
+	d3dDevice->ClearRenderTargetView(renderTargetView, bgColor);
+
+	swapChain->Present(0, 0);
+}
+*/

@@ -1,34 +1,8 @@
 #include "window.h"
-Window::Window()
-{
-}
-
-
-Window::~Window()
-{
-}
-LRESULT CALLBACK WndProc(HWND hwnd, //window handler
-	UINT msg, //message handler
-	WPARAM wParam, //extra message information(keyboard imput detection)
-	LPARAM lParam) //extra message information(keyboard imput detection)
-{
-	switch (msg)
-	{
-		case WM_KEYDOWN:
-			if (wParam == VK_ESCAPE)
-			{
-				if (MessageBox(0, "Are you sure you want to quit?", "Really?", MB_YESNO | MB_ICONQUESTION) == IDYES)
-					DestroyWindow(hwnd);
-			}
-			return 0;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
-	}
-	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
+#include "dxmanager.h"
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 //Window Initialization Function
-bool Window::InitializeWindow(HINSTANCE* hInstance, HWND *hwnd, LPCTSTR *WndClassName, int showWnd, int width, int height, bool windowed)
+bool Window::InitializeWindow(HINSTANCE* hInstance, HWND* hwnd, LPCTSTR WndClassName, LPCSTR WndTitle, int showWnd, int* width, int* height, bool* windowed)
 {
 	//extended styles of WNDCLASSESEX
 	typedef struct _WNDCLASS
@@ -78,7 +52,7 @@ bool Window::InitializeWindow(HINSTANCE* hInstance, HWND *hwnd, LPCTSTR *WndClas
 	wc.lpszMenuName = NULL;
 
 	//Name of Class
-	wc.lpszClassName = *WndClassName;
+	wc.lpszClassName = WndClassName;
 
 	//Taskbar Icon
 	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
@@ -92,11 +66,11 @@ bool Window::InitializeWindow(HINSTANCE* hInstance, HWND *hwnd, LPCTSTR *WndClas
 
 	//Creation of window
 	*hwnd = CreateWindowEx(NULL, //WNDCLASSEX Styles to be applied to this specific window
-		*WndClassName, //name of registered class that we use
-		"Perception - 0.0.0.1", //name of the window
+		WndClassName, //name of registered class that we use
+		WndTitle, //name of the window
 		WS_OVERLAPPEDWINDOW, //window styles (seperate by '|')
 		CW_USEDEFAULT, CW_USEDEFAULT, //Starting x&y positions
-		width, height, //size of window
+		*width, *height, //size of window
 		NULL, //handle to parent window (we don't have a parent)
 		NULL, //handle to menu attached to window (no menu)
 		*hInstance, //instance of current program
@@ -137,10 +111,30 @@ int Window::messageLoop()
 		//if it was not a windows message, run the game
 		else
 		{
-			//game code
 		}
 	}
+
 	return msg.wParam;
 }
 
 //message processing
+LRESULT CALLBACK WndProc(HWND hwnd, //window handler
+	UINT msg, //message handler
+	WPARAM wParam, //extra message information(keyboard imput detection)
+	LPARAM lParam) //extra message information(keyboard imput detection)
+{
+	switch (msg)
+	{
+		case WM_KEYDOWN:
+			if (wParam == VK_ESCAPE)
+			{
+				if (MessageBox(0, "Are you sure you want to quit?", "Really?", MB_YESNO | MB_ICONQUESTION) == IDYES)
+					DestroyWindow(hwnd);
+			}
+			return 0;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
+	}
+	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
