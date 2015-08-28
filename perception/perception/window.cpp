@@ -1,5 +1,8 @@
+#pragma once
 #include "window.h"
 #include "dxmanager.h"
+#include <d3d10.h>
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 //Window Initialization Function
 bool Window::InitializeWindow(HINSTANCE* hInstance, HWND* hwnd, LPCTSTR WndClassName, LPCSTR WndTitle, int showWnd, int* width, int* height, bool* windowed)
@@ -89,7 +92,7 @@ bool Window::InitializeWindow(HINSTANCE* hInstance, HWND* hwnd, LPCTSTR WndClass
 }
 
 //Message Loop until program is closed
-int Window::messageLoop()
+int Window::messageLoop(DXManager* DXM,ID3D10Device* d3dDevice, IDXGISwapChain* swapChain, ID3D10RenderTargetView* renderTargetView)
 {
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
@@ -111,6 +114,26 @@ int Window::messageLoop()
 		//if it was not a windows message, run the game
 		else
 		{
+			float red = 0.0f;
+			float green = 0.0f;
+			float blue = 0.0f;
+			int colormodr = 1;
+			int colormodg = 1;
+			int colormodb = 1;
+			red += colormodr * 0.00005f;
+			green += colormodg * 0.00002f;
+			blue += colormodb * 0.00001f;
+
+			if (red >= 1.0f || red <= 0.0f)
+				colormodr *= -1;
+			if (green >= 1.0f || green <= 0.0f)
+				colormodg *= -1;
+			if (blue >= 1.0f || blue <= 0.0f)
+				colormodb *= -1;
+
+			const FLOAT bgColor[4] = { red, green, blue, 1.0f };
+				d3dDevice->ClearRenderTargetView(renderTargetView, bgColor);
+				swapChain->Present(0, 0);
 		}
 	}
 
