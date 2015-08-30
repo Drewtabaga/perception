@@ -14,21 +14,9 @@ int colormodb = 1;
 
 bool DXManager::InitializeDirect3dApp(HINSTANCE* hInstance, HWND* hwnd, ID3D10Device* d3dDevice, IDXGISwapChain* swapChain, ID3D10RenderTargetView* renderTargetView, int* width, int* height, bool* windowed)
 {
-	//definition of swap chain
-	/*typedef struct DXGI_SWAP_CHAIN_DESC
-	{
-		DXGI_MODE_DESC BufferDesc;
-		DXGI_SAMPLE_DESC SampleDesc;
-		DXGI_USAGE BufferUsage;
-		UINT BufferCount;
-		HWND OutputWindow;
-		BOOL Windowed;
-		DXGI_SWAP_EFFECT SwapEffect;
-		UINT Flags;
-	}DXGI_SWAP_CHAIN_DESK;
 	DXGI_SWAP_CHAIN_DESC scd;
 	//defines general properties of our back buffer
-	/*typedef struct DXGI_MODE_DESC
+	typedef struct DXGI_MODE_DESC
 	{
 		UINT Width;
 		UINT Height;
@@ -76,8 +64,8 @@ bool DXManager::InitializeDirect3dApp(HINSTANCE* hInstance, HWND* hwnd, ID3D10De
 		__in DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, //a pointer to DXGI_SWAP_CHAIN_DESC which describes the swap chain we want to make
 		__out IDXGISwapChain **ppSwapChain, //returns the created swap chain
 		__out ID3D10Device **ppDevice //returns the created device
-	);
-	D3D10CreateDeviceAndSwapChain(0, //*pAdapter
+	);*/
+	/*D3D10CreateDeviceAndSwapChain(0, //*pAdapter
 								D3D10_DRIVER_TYPE_HARDWARE, //DriverType
 								0, //Software Rasterizing
 								0, //Flags
@@ -97,16 +85,6 @@ bool DXManager::InitializeDirect3dApp(HINSTANCE* hInstance, HWND* hwnd, ID3D10De
 	d3dDevice->OMSetRenderTargets(1, //number of render targets to send to the pipeline
 								&renderTargetView, //pointer to the first element in an array of render target view pointers to bind to the pipeline
 								NULL); //pointer to the depth/stencil view to bind to the pipeline (we dont have one)
-	/*Viewport Creation. (Causing an error-please examine.)
-	//typedef struct D3D10_VIEWPORT
-	//{
-	//	INT TopLeftX; //define how big and where our vbiewport is drawn onto the backbuffer.
-	//	INT TopLeftY; //...
-	//	UINT Width; //...
-	//	UINT Height; //...
-	//	FLOAT MinDepth; //minimum depth value in the buffer
-	//	FLOAT MaxDepth; //maximum depth value in the buffer
-	//}D3D10_VIEWPORT;
 	D3D10_VIEWPORT vp;
 	vp.TopLeftY = 0;
 	vp.Width = *width;

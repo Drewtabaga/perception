@@ -1,8 +1,4 @@
 
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "d3dx11.lib")
-#pragma comment(lib, "d3dx10.lib")
-
 #include <windows.h>
 #include <d3d11.h>
 #include <d3dx11.h>
@@ -12,33 +8,35 @@ IDXGISwapChain* swapChain; //buffer to stop screen flickering (multilayered visu
 ID3D11Device* d3d11Device; //sofrware controller to the graphics device
 ID3D11DeviceContext* d3d11DevCon; //renders the screen in the background
 ID3D11RenderTargetView* renderTargetView; //render target for back buffer
-//temporary
-float red = 0.0f;
-float green = 0.0f;
-float blue = 0.0f;
-int colormodr = 1;
-int colormodg = 1;
-int colormodb = 1;
-
+//temporary  /**/**/**/**/**/
+/**/ float red = 0.0f;   /**/
+/**/ float green = 0.0f; /**/
+/**/ float blue = 0.0f;  /**/
+/**/ int colormodr = 1;  /**/
+/**/ int colormodg = 1;  /**/
+/**/ int colormodb = 1;  /**/
+//end temporary /**/**/**/**/
 LPCTSTR wndClassName = "perception"; //class name
 LPCSTR wndTitle = "Perception - 0.0.0.1"; //window title
+bool windowed = true; //windowed
 HWND hwnd = NULL; //window instance
 
-const int width = 1024;
-const int height = 768;
+const int width = 1024; //window width
+const int height = 768; //window height
 
-bool initializeDirect3d11App(HINSTANCE hInstance);
-void releaseObjects();
-bool initScene();
-void updateScene();
-void drawScene();
-bool initializeWindow(HINSTANCE hInstance,int showWnd,int width, int height,bool windowed);
-int messageloop();
-LRESULT CALLBACK wndProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam);
+bool initializeWindow(HINSTANCE hInstance, int showWnd, int width, int height, bool windowed); //sets up the window
+bool initializeDirect3d11App(HINSTANCE hInstance); //initialize DirectX
+void releaseObjects(); //releases objects to stop memory leaking
+bool initScene(); //initializes the scene
+void updateScene(); //updates scene per frame
+void drawScene(); //draws the updated frame
+int messageLoop(); //keeps the program running and always doing something 
+LRESULT CALLBACK wndProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam); //our windows processing function
 
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nShowCmd)
 {
 
+	//initializes the window, and if it fails, quits and sends a message.
 	if (!initializeWindow(hInstance, nShowCmd, width, height, true))
 	{
 		MessageBox(0, "Window Initialization - Failed",
@@ -46,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 		return 0;
 	}
 
-
+	//initializes DirectX
 	if (!initializeDirect3d11App(hInstance))
 	{
 		MessageBox(0, "Direct3D Initialization - Failed",
@@ -54,15 +52,16 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 		return 0;
 	}
 
+	//If all else succeeds, Initializes the scene.
 	if (!initScene())
 	{
 		MessageBox(0, "Scene Initialization - Failed",
 			"Error", MB_OK);
 		return 0;
 	}
-
-	messageloop();
-
+	//puts the program into a loop
+	messageLoop();
+	//releases unused objects
 	releaseObjects();
 
 	return 0;
@@ -180,6 +179,7 @@ void releaseObjects()
 	d3d11Device->Release();
 	d3d11DevCon->Release();
 }
+
 bool initScene()
 {
 
@@ -209,7 +209,7 @@ void drawScene()
 	swapChain->Present(0, 0);
 }
 
-int messageloop()
+int messageLoop()
 {
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
@@ -260,42 +260,3 @@ LRESULT CALLBACK wndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		wParam,
 		lParam);
 }
-
-/*#pragma once
-#include "window.h"
-#include "dxmanager.h"
-#include <Windows.h>
-#include <d3d10.h>*/
-/*int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
-	ID3D10Device* d3dDevice = NULL; //sofrware controller to the graphics device
-	IDXGISwapChain* swapChain = NULL; //buffer to stop screen flickering (multilayered visuals)
-	ID3D10RenderTargetView* renderTargetView = NULL; //render target for back buffer
-	int width = 1024; //window width
-	int height = 768; //window height
-	bool windowed = true; //windowed (T/F)
-	HWND hwnd = NULL; //window instance
-
-
-
-	//initializes the window, and if it fails, quits and sends a message.
-	if (!window->InitializeWindow(&hInstance, &hwnd, wndClassName, wndTitle, nShowCmd, &width, &height, &windowed))
-	{
-		MessageBox(0, "Window Initialization - Failed", "Error", MB_OK);
-		return 0;
-	}
-	//Initializes Direct3D
-	if (!DXM->InitializeDirect3dApp(&hInstance, &hwnd, d3dDevice, swapChain, renderTargetView, &width, &height, &windowed))
-	{
-		MessageBox(0, "Direct3D Initialization - Failed", "Error", MB_OK);
-		return 0;
-	}
-	//If all else succeeds, Initializes the scene.
-	if (!DXM->InitScene())
-	{
-		MessageBox(0, "Scene Initialization - Failed", "Error", MB_OK);
-		return 0;
-	}
-	window->messageLoop(DXM,d3dDevice, swapChain, renderTargetView);
-	return 0;
-}*/
