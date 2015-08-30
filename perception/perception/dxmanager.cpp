@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "dxmanager.h"
 #include "window.h"
 #include <d3d10.h>
@@ -25,7 +25,7 @@ bool DXManager::InitializeDirect3dApp(HINSTANCE* hInstance, HWND* hwnd, ID3D10De
 		BOOL Windowed;
 		DXGI_SWAP_EFFECT SwapEffect;
 		UINT Flags;
-	}DXGI_SWAP_CHAIN_DESK;*/
+	}DXGI_SWAP_CHAIN_DESK;
 	DXGI_SWAP_CHAIN_DESC scd;
 	//defines general properties of our back buffer
 	/*typedef struct DXGI_MODE_DESC
@@ -36,7 +36,8 @@ bool DXManager::InitializeDirect3dApp(HINSTANCE* hInstance, HWND* hwnd, ID3D10De
 		DXGI_FORMAT Format;
 		DXGI_MODE_SCANLINE_ORDER ScanlineOrdering;
 		DXGI_MODE_SCALING Scaling;
-	}DXGI_MODE_DESC, *LPDXGI_MODE_DESC;*/
+	}DXGI_MODE_DESC, *LPDXGI_MODE_DESC;
+
 	scd.BufferDesc.Width = *width; //width of window
 	scd.BufferDesc.Height = *height; //height of window
 	scd.BufferDesc.RefreshRate.Numerator = 60;
@@ -75,7 +76,7 @@ bool DXManager::InitializeDirect3dApp(HINSTANCE* hInstance, HWND* hwnd, ID3D10De
 		__in DXGI_SWAP_CHAIN_DESC *pSwapChainDesc, //a pointer to DXGI_SWAP_CHAIN_DESC which describes the swap chain we want to make
 		__out IDXGISwapChain **ppSwapChain, //returns the created swap chain
 		__out ID3D10Device **ppDevice //returns the created device
-	);*/
+	);
 	D3D10CreateDeviceAndSwapChain(0, //*pAdapter
 								D3D10_DRIVER_TYPE_HARDWARE, //DriverType
 								0, //Software Rasterizing
@@ -105,7 +106,7 @@ bool DXManager::InitializeDirect3dApp(HINSTANCE* hInstance, HWND* hwnd, ID3D10De
 	//	UINT Height; //...
 	//	FLOAT MinDepth; //minimum depth value in the buffer
 	//	FLOAT MaxDepth; //maximum depth value in the buffer
-	//}D3D10_VIEWPORT;*/
+	//}D3D10_VIEWPORT;
 	D3D10_VIEWPORT vp;
 	vp.TopLeftY = 0;
 	vp.Width = *width;
@@ -129,4 +130,4 @@ bool DXManager::InitScene()
 }
 void DXManager::DrawScene(ID3D10Device* d3dDevice, IDXGISwapChain* swapChain, ID3D10RenderTargetView* renderTargetView)
 {
-}
+}*/

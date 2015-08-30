@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "window.h"
 #include "dxmanager.h"
 #include <d3d10.h>
@@ -89,9 +89,9 @@ bool Window::InitializeWindow(HINSTANCE* hInstance, HWND* hwnd, LPCTSTR WndClass
 	UpdateWindow(*hwnd);
 
 	return true;
-}
+}*/
 
-//Message Loop until program is closed
+/*//Message Loop until program is closed
 int Window::messageLoop(DXManager* DXM,ID3D10Device* d3dDevice, IDXGISwapChain* swapChain, ID3D10RenderTargetView* renderTargetView)
 {
 	MSG msg;
@@ -160,4 +160,4 @@ LRESULT CALLBACK WndProc(HWND hwnd, //window handler
 			return 0;
 	}
 	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
+}*/
