@@ -27,16 +27,16 @@ bool initScene(); //initializes the scene
 void updateScene(); //updates scene per frame
 void drawScene(); //draws the updated frame
 int messageLoop(); //keeps the program running and always doing something 
-LRESULT CALLBACK wndProc(HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam); //our windows processing function
+LRESULT CALLBACK wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam); //our windows processing function
 
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nShowCmd)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 
 	//initializes the window, and if it fails, quits and sends a message.
 	if (!initializeWindow(hInstance, nShowCmd, width, height, true))
 	{
 		MessageBox(0, "Window Initialization - Failed",
-			"Error", MB_OK);
+				   "Error", MB_OK);
 		return 0;
 	}
 
@@ -44,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 	if (!initializeDirect3d11App(hInstance))
 	{
 		MessageBox(0, "Direct3D Initialization - Failed",
-			"Error", MB_OK);
+				   "Error", MB_OK);
 		return 0;
 	}
 
@@ -52,7 +52,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 	if (!initScene())
 	{
 		MessageBox(0, "Scene Initialization - Failed",
-			"Error", MB_OK);
+				   "Error", MB_OK);
 		return 0;
 	}
 	//puts the program into a loop
@@ -71,17 +71,17 @@ bool initializeWindow(HINSTANCE hInstance, //application handle
 {
 	/*typedef struct _WNDCLASS
 	{
-		UINT cbSize;
-		UINT style;
-		WNDPROC lpfnWndProc;
-		int cbClsExtra;
-		int cbWndExtra;
-		HANDLE hInstance;
-		HICON hIcon;
-		HCURSOR hCursor;
-		HBRUSH hbrBackground;
-		LPCTSTR lpszMenuName;
-		LPCTSTR lpszClassName;
+	UINT cbSize;
+	UINT style;
+	WNDPROC lpfnWndProc;
+	int cbClsExtra;
+	int cbWndExtra;
+	HANDLE hInstance;
+	HICON hIcon;
+	HCURSOR hCursor;
+	HBRUSH hbrBackground;
+	LPCTSTR lpszMenuName;
+	LPCTSTR lpszClassName;
 	} WNDCLASS;*/
 
 	WNDCLASSEX wc; //extended styles windows class
@@ -104,27 +104,27 @@ bool initializeWindow(HINSTANCE hInstance, //application handle
 	if (!RegisterClassEx(&wc)) //registering of the class, if it fails:
 	{
 		MessageBox(NULL, "Error registering class", //we return a message
-			"Error", MB_OK | MB_ICONERROR);
+				   "Error", MB_OK | MB_ICONERROR);
 		return 1;
 	}
 
 	hwnd = CreateWindowEx( //creating our window
-		NULL, //extended styles
-		wndClassName, //the class we registered earlier
-		wndTitle, //the window title
-		WS_OVERLAPPEDWINDOW, //CreteWindow functions styles, 
-		CW_USEDEFAULT, CW_USEDEFAULT, //starting positions of the window
-		width, height, //size of the window
-		NULL, //handle to the parent window
-		NULL, //handle to the menu attached to the window
-		hInstance, //intance of the program
-		NULL //used if the program was a MDI program
-		);
+						  NULL, //extended styles
+						  wndClassName, //the class we registered earlier
+						  wndTitle, //the window title
+						  WS_OVERLAPPEDWINDOW, //CreteWindow functions styles, 
+						  CW_USEDEFAULT, CW_USEDEFAULT, //starting positions of the window
+						  width, height, //size of the window
+						  NULL, //handle to the parent window
+						  NULL, //handle to the menu attached to the window
+						  hInstance, //intance of the program
+						  NULL //used if the program was a MDI program
+						  );
 
 	if (!hwnd) //check to see if the window was created
 	{
 		MessageBox(NULL, "Error creating window",
-			"Error", MB_OK | MB_ICONERROR);
+				   "Error", MB_OK | MB_ICONERROR);
 		return 1;
 	}
 
@@ -137,7 +137,7 @@ bool initializeWindow(HINSTANCE hInstance, //application handle
 bool initializeDirect3d11App(HINSTANCE hInstance) //initializes directx
 {
 	DXGI_MODE_DESC bufferDesc; //defines general purpose of our back buffer
-	ZeroMemory(&bufferDesc, sizeof(DXGI_MODE_DESC)); 
+	ZeroMemory(&bufferDesc, sizeof(DXGI_MODE_DESC));
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc; //defines general purpose of our swapChain buffer
 	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
@@ -230,12 +230,12 @@ int messageLoop() //keeps the program going
 	while (true)
 	{
 		/*BOOL PeekMessageL(
-			LPMSG lpMsg,
-			HWND hWnd,
-			UINT wMsgFilterMin,
-			UINT wMsgFilterMax,
-			UINT wRemoveMsg
-			);*/
+		LPMSG lpMsg,
+		HWND hWnd,
+		UINT wMsgFilterMin,
+		UINT wMsgFilterMax,
+		UINT wRemoveMsg
+		);*/
 
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) //if the message was a windows message
 		{
@@ -260,16 +260,16 @@ LRESULT CALLBACK wndProc(HWND hwnd, //window handle
 {
 	switch (msg)
 	{
-		case WM_KEYDOWN:
-			if (wParam == VK_ESCAPE) //if the button pressed was escape
-			{
-				DestroyWindow(hwnd); //close the window
-			}
-			return 0;
+	case WM_KEYDOWN:
+		if (wParam == VK_ESCAPE) //if the button pressed was escape
+		{
+			DestroyWindow(hwnd); //close the window
+		}
+		return 0;
 
-		case WM_DESTROY:  //if the window is closed
-			PostQuitMessage(0); //no post quit message
-			return 0; //end the program
+	case WM_DESTROY:  //if the window is closed
+		PostQuitMessage(0); //no post quit message
+		return 0; //end the program
 	}
-	return DefWindowProc(hwnd,msg,wParam,lParam); //takes care of the rest of the unhandled messages
+	return DefWindowProc(hwnd, msg, wParam, lParam); //takes care of the rest of the unhandled messages
 }
